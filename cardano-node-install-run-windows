@@ -1,0 +1,125 @@
+How to install and run cardano node on windows 10 using Command Prompt(cmd)
+---------------------------------------------------------------------------
+
+A. Pre-requisites:
+
+1. Internet Speed = DOWNLOAD Mbps 4.75, UPLOAD Mbps 1.18
+2. RAM : 4GB
+3. HDD : 10GB
+4. CPU : core i7/core i5/core i3
+5. Time : 3 - 4 days ):
+6. You must have a wallet address funded with 1000 testADA(https://wallets.com/cardano/, https://testnets.cardano.org/en/testnets/cardano/tools/faucet/)
+
+B. Official Link
+
+- https://developers.cardano.org/docs/get.started/installing.cardano.node
+
+C. Installating Cardano Node.
+
+1. Download cardano node and cli hydra binaries using this link 
+-  https://hydra.iohk.io/build/16338127/download/1/cardano.node.1.35.0.win64.zip
+2. Extract the files using windows: right click the zipped downloaded folder and select Extract all. Click Extract.
+3. Renamed the extracted folder to cardano and then copy the folder with all its contents to C:\ drive
+4. Inside cardano folder create another folder db
+
+*** If you check the folder cardano, it will have 33 items(2 folders and 31 files). Congratulations you have installed the Cardano node and cli!
+
+D. Official Link 
+
+- https://developers.cardano.org/docs/get.started/running.cardano/
+
+E. Running the cardano node (Takes long 24 - 48 hours). 'No need to freak, preparing a car in a garage can take 3 weeks. Be drinking coffee or beer!'
+
+1. On Windows 10, at the bottom left there is a search box, type in cmd and right click this black icon named 'command prompt' and select Run as Administrator.
+2. Type cd\ and press Enter in order to change folder to the drive c:\ location
+3. Type cd cardano and press Enter in order to move from drive c:\ to a folder cardano in drive c
+4. You must be at c:\cardano> location or something similar
+5. Download the testnet configuration files by copying the commands below and pasting them on the commandline prompt
+
+curl -O -J https://hydra.iohk.io/build/7654130/download/1/testnet-topology.json
+curl -O -J https://hydra.iohk.io/build/7654130/download/1/testnet-shelley-genesis.json
+curl -O -J https://hydra.iohk.io/build/7654130/download/1/testnet-config.json
+curl -O -J https://hydra.iohk.io/build/7654130/download/1/testnet-byron-genesis.json
+curl -O -J https://hydra.iohk.io/build/7654130/download/1/testnet-alonzo-genesis.json
+
+Curl is a command that runs the url and in this case the url downloads a file to the folder cardano because we are at c:\cardano>. So 5 files will be downloaded to the folder
+c:\cardano namely : testnet-topology.json, testnet-shelley-genesis.json, testnet-config.json, testnet-byron-genesis.json and testnet-alonzo-genesis.json
+
+6. Set cardano-node-testnet names node.socket in linux at Environment Variables
+-Go to windows bottom left search box and type in Control Panel. 
+-At Control Panel top right search box type in system and press enter. Click 'Edit the system environment Variables'.
+-At system properties box, at the Advanced tab, click 'Environment Variables' button at the bottom right.
+-There are 2 buttons named New. Click the top one and on the first box enter at Variable Name enter CARDANO_NODE_SOCKET_PATH and at Variable Value enter this 
+\\.\pipe\cardano-node-testnet and click Ok. Do the same for the second New bottom button.
+
+7. Run Cardano Node with 5 arguments using the command below 
+
+ cardano-node run --topology testnet-topology.json ^
+   --database-path db ^
+   --socket-path "\\.\pipe\cardano-node-testnet" ^
+   --host-addr 127.0.0.1 ^
+   --port 8088 ^
+   --config testnet-config.json
+   
+Linux command breaks lines using back slash \ but windows prompt breaks lines using carat ^
+
+This link https://developers.cardano.org/docs/get-started/running-cardano/ does not show how windows cmd commands must be formatted but only shows linux 
+
+cardano-node run \
+--config $HOME/cardano/testnet-config.json \
+--database-path $HOME/cardano/db/ \
+--socket-path $HOME/cardano/db/node.socket \
+--host-addr 127.0.0.1 \
+--port 1337 \
+--topology $HOME/cardano/testnet-topology.json
+
+or you will see this that does not show the variable $Home which holds the path to the .json files
+
+ cardano-node run \
+   --topology path/to/mainnet-topology.json \
+   --database-path path/to/db \
+   --socket-path path/to/db/node.socket \
+   --host-addr x.x.x.x \
+   --port 3001 \
+   --config path/to/mainnet-config.json
+   
+ This 'path/to' is confusing because it can make you think path and to are local folders where those json files are but they are just explanations telling users
+ that they should supply path to the .json files. In number 7 above, we downloaded .json files to folder cardano and so the path is left out. Confusing is the node.socket which
+ in windows is the cardano-node-testnet. It is not a folder but a file Cardano Node will create and use.
+ 
+ --host-addr must be assigned the ip address of the pc running the node and in this case it is the local pc that is why we loop back with 127.0.0.1. and the --port can be any unused port numbers.
+ 3001 was just chosen because in my pc it is not used.
+ 
+Press Enter to run the cardano node and watch as it downloads data with increasing slot numbers.
+
+8. Querying the Cardano Blockchain: Getting information from the blockchain.
+
+- Open another command prompt terminal and run the query 'cardano-cli query tip --testnet-magic 1097911063' as shown below
+
+F:\cardano>cardano-cli query tip --testnet-magic 1097911063
+{
+    "block": 2740904,
+    "epoch": 143,
+    "era": "Mary",
+    "hash": "e5fa379cbfec5141f958a6fd7a4519a1d1155ea6f8036d8e8d3493f296822cfe",
+    "slot": 31496336,
+    "syncProgress": "64.04"
+}
+
+You will get the block number, epoch number, era, hash, slot ans syncProgress: this should go to 100. Find out what these numbers, slot are for.
+
+9. Use Cardano Node to get the balance of your test address funded in number A.6 by running the command below 
+
+cardano-cli query utxo --testnet-magic 1097911063 --address addr_test1qpg5l4ydj5rlr0mx6m23vpgcxst4nqqakduj9p5hcekh3ac7shp9hrg50mzgcak36ssett63kyl8pl2yzdeaa36pmc0stk6zkw
+
+replace addr_test1qpg5l4ydj5rlr0mx6m23vpgcxst4nqqakduj9p5hcekh3ac7shp9hrg50mzgcak36ssett63kyl8pl2yzdeaa36pmc0stk6zkw with your address
+
+NOTE: run this command E.9 when your node is fully synched otherwise you will get these:
+
+i) Error: Command failed: query utxo  Error: This query cannot be used for the Byron era
+ii) It will be empty as shown below
+                           TxHash                                 TxIx        Amount
+--------------------------------------------------------------------------------------
+
+
+
